@@ -1,12 +1,15 @@
 using Microsoft.SemanticKernel;
+using Rashan.SemanticKernel.Langfuse.Observability;
 using System.Diagnostics;
+
+namespace Rashan.SemanticKernel.Langfuse;
 
 public class LangfuseSemanticKernelFilter : IPromptRenderFilter, IFunctionInvocationFilter
 {
-    private readonly LangfuseClient _langfuse;
+    private readonly ILangfuseClient _langfuse;
     private readonly string _traceId;
 
-    public LangfuseSemanticKernelFilter(LangfuseClient langfuse, string? traceId = null)
+    public LangfuseSemanticKernelFilter(ILangfuseClient langfuse, string? traceId = null)
     {
         _langfuse = langfuse;
         _traceId = traceId ?? Guid.NewGuid().ToString();
@@ -14,15 +17,15 @@ public class LangfuseSemanticKernelFilter : IPromptRenderFilter, IFunctionInvoca
 
     public async Task OnPromptRenderAsync(PromptRenderContext context, Func<PromptRenderContext, Task> next)
     {
-        var stopwatch = Stopwatch.StartNew();
+        var startTime = DateTimeOffset.UtcNow;
         
         await next(context);
         
-        stopwatch.Stop();
+        var endTime = DateTimeOffset.UtcNow;
 
         await _langfuse.CreateSpanAsync(
-            _traceId,
-            "prompt_render",
+            traceId: _traceId,
+            name: "prompt_render",
             input: new Dictionary<string, object>
             {
                 { "function", context.Function.Name },
@@ -34,14 +37,16 @@ public class LangfuseSemanticKernelFilter : IPromptRenderFilter, IFunctionInvoca
             },
             metadata: new Dictionary<string, object>
             {
-                { "duration_ms", stopwatch.ElapsedMilliseconds }
-            }
+                { "duration_ms", (endTime - startTime).TotalMilliseconds }
+            },
+            startTime: startTime,
+            endTime: endTime
         );
     }
 
     public async Task OnFunctionInvocationAsync(FunctionInvocationContext context, Func<FunctionInvocationContext, Task> next)
     {
-        var stopwatch = Stopwatch.StartNew();
+        var startTime = DateTimeOffset.UtcNow;
         var functionName = context.Function.Name;
         
         // Extract input
@@ -49,7 +54,7 @@ public class LangfuseSemanticKernelFilter : IPromptRenderFilter, IFunctionInvoca
         
         await next(context);
         
-        stopwatch.Stop();
+        var endTime = DateTimeOffset.UtcNow;
 
         // Extract output
         var output = context.Result?.ToString() ?? "";
@@ -75,14 +80,16 @@ public class LangfuseSemanticKernelFilter : IPromptRenderFilter, IFunctionInvoca
         var modelName = context.Function.Metadata.PluginName ?? "unknown";
 
         await _langfuse.CreateGenerationAsync(
-            _traceId,
-            functionName,
-            modelName,
-            input: string.Join(", ", input.Select(x => $"{x.Key}: {x.Value}")),
-            output: output,
+            traceId: _traceId,
+            name: functionName,
+            startTime: startTime,
+            endTime: endTime,
+            model: modelName,
+            prompt: string.Join(", ", input.Select(x => $"{x.Key}: {x.Value}")),
+            response: output,
             metadata: new Dictionary<string, object>
             {
-                { "duration_ms", stopwatch.ElapsedMilliseconds },
+                { "duration_ms", (endTime - startTime).TotalMilliseconds },
                 { "plugin", context.Function.Metadata.PluginName ?? "" }
             },
             promptTokens: promptTokens,

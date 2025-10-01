@@ -4,15 +4,37 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- Package Info -->
     <PackageId>Rashan.SemanticKernel.Langfuse</PackageId>
     <Version>0.1.0</Version>
     <Authors>Rashan</Authors>
+    <Company>Rashan</Company>
     <Description>Langfuse observability integration for Microsoft Semantic Kernel</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/rashan/Rashan.SemanticKernel.Langfuse</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rashan/Rashan.SemanticKernel.Langfuse</RepositoryUrl>
-    <PackageTags>semantickernel;langfuse;observability;dotnet</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>semantickernel;langfuse;observability;dotnet;ai;llm</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    
+    <!-- Build Configuration -->
+    <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+
+    <!-- Strong Name Signing -->
+    <SignAssembly>false</SignAssembly>
+    <!-- <AssemblyOriginatorKeyFile>../../key.snk</AssemblyOriginatorKeyFile> -->
+    <!-- <DelaySign>false</DelaySign> -->
+
+    <!-- Source Link -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,8 +42,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SemanticKernel" Version="1.65.0" />
-    <PackageReference Include="System.Net.Http.Json" Version="9.0.9" />
+    <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.65.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Abstractions" Version="1.65.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
   </ItemGroup>
 
 </Project>
