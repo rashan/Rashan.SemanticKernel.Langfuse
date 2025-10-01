@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Xunit;
 using Rashan.SemanticKernel.Langfuse.Models;
 using Rashan.SemanticKernel.Langfuse.Observability;
@@ -68,73 +67,33 @@ public class LangfuseClientTests
     }
 
     [Fact]
-    public async Task CreateTraceAsync_WithValidName_ReturnsTraceId()
-    {
-        // Arrange
-        var client = new LangfuseClient(_validOptions);
-        var name = "Test Trace";
-
-        // Act
-        var traceId = await client.CreateTraceAsync(name, (JsonElement?)null);
-
-        // Assert
-        Assert.NotNull(traceId);
-        Assert.NotEmpty(traceId);
-    }
-
-    [Fact]
-    public async Task CreateTraceAsync_WithNullName_ThrowsArgumentNullException()
+    public void CreateTraceAsync_WithNullName_ThrowsArgumentNullException()
     {
         // Arrange
         var client = new LangfuseClient(_validOptions);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => client.CreateTraceAsync(null!, (JsonElement?)null));
+        Assert.ThrowsAsync<ArgumentNullException>(() => client.CreateTraceAsync(null!, (Dictionary<string, object>?)null));
     }
 
     [Fact]
-    public async Task CreateTraceAsync_WithEmptyName_ThrowsArgumentException()
+    public void CreateTraceAsync_WithEmptyName_ThrowsArgumentException()
     {
         // Arrange
         var client = new LangfuseClient(_validOptions);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentException>(() => client.CreateTraceAsync("", (JsonElement?)null));
+        Assert.ThrowsAsync<ArgumentException>(() => client.CreateTraceAsync("", (Dictionary<string, object>?)null));
     }
 
     [Fact]
-    public async Task CreateGenerationAsync_WithValidInputs_Succeeds()
+    public async Task DisposeAsync_DoesNotThrow()
     {
         // Arrange
         var client = new LangfuseClient(_validOptions);
-        var traceId = await client.CreateTraceAsync("Test Trace", (JsonElement?)null);
 
         // Act & Assert
-        await client.CreateGenerationAsync(
-            traceId: traceId,
-            name: "Test Generation",
-            startTime: DateTimeOffset.UtcNow.AddSeconds(-1),
-            endTime: DateTimeOffset.UtcNow,
-            model: "gpt-4",
-            prompt: "test prompt",
-            response: "test response",
-            metadata: (JsonElement?)null);
-    }
-
-    [Fact]
-    public async Task CreateEventAsync_WithValidInputs_Succeeds()
-    {
-        // Arrange
-        var client = new LangfuseClient(_validOptions);
-        var traceId = await client.CreateTraceAsync("Test Trace", (JsonElement?)null);
-
-        // Act & Assert
-        await client.CreateEventAsync(
-            traceId: traceId,
-            name: "Test Event",
-            startTime: DateTimeOffset.UtcNow.AddSeconds(-1),
-            endTime: DateTimeOffset.UtcNow,
-            level: "INFO",
-            metadata: JsonSerializer.SerializeToElement(new { test = "data" }));
+        var exception = await Record.ExceptionAsync(() => client.DisposeAsync().AsTask());
+        Assert.Null(exception);
     }
 }

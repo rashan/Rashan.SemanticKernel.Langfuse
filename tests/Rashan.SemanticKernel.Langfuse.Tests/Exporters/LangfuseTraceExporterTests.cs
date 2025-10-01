@@ -22,6 +22,14 @@ public class LangfuseTraceExporterTests : IDisposable
         _activitySource = new ActivitySource("Microsoft.SemanticKernel.Test");
         _exporter = new LangfuseTraceExporter(_mockLangfuseClient.Object, _mockLogger.Object);
 
+        // Setup activity listener to enable activity creation
+        var listener = new ActivityListener
+        {
+            ShouldListenTo = _ => true,
+            Sample = (ref ActivityCreationOptions<ActivityContext> options) => ActivitySamplingResult.AllData
+        };
+        ActivitySource.AddActivityListener(listener);
+
         // Setup mock to return trace IDs
         _mockLangfuseClient
             .Setup(x => x.CreateTraceAsync(It.IsAny<string>(), It.IsAny<Dictionary<string, object>?>(), It.IsAny<CancellationToken>()))
