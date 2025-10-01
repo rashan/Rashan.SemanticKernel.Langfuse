@@ -178,7 +178,16 @@ The integration automatically captures:
 
 ## Examples
 
-For more detailed examples and use cases, see the examples directory in the repository.
+For hands-on examples and complete working applications, see the [examples directory](../examples/) in the repository:
+
+- **[ChatClient](../examples/ChatClient/)** - Interactive console chat application demonstrating automatic OpenTelemetry integration
+- More examples coming soon!
+
+Each example includes:
+- Complete source code with documentation
+- Step-by-step setup instructions
+- Configuration examples for different scenarios
+- Troubleshooting guides
 
 ## Troubleshooting
 
