@@ -2,24 +2,6 @@
 
 A .NET NuGet package for integrating Langfuse observability with Microsoft Semantic Kernel.
 
-## Installation
-
-Install the package via NuGet:
-
-```bash
-dotnet add package Rashan.SemanticKernel.Langfuse
-```
-
-## Usage
-
-Brief example of how to use the package:
-
-```csharp
-using Rashan.SemanticKernel.Langfuse;
-
-// Example code here
-```
-
 ## Features
 
 - Seamless integration with Microsoft Semantic Kernel

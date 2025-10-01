@@ -1,4 +1,4 @@
-# Getting Started
+# Getting Started with Rashan.SemanticKernel.Langfuse
 
 ## Prerequisites
 
@@ -16,12 +16,9 @@ dotnet add package Rashan.SemanticKernel.Langfuse
 
 ## Overview
 
-This package provides two main approaches for integrating Semantic Kernel with Langfuse:
+This package provides a modern OpenTelemetry-based integration for connecting Semantic Kernel with Langfuse, following industry-standard observability practices with automatic instrumentation.
 
-1. **OpenTelemetry Integration (Recommended)** - Modern, industry-standard approach
-2. **Filter-based Integration (Legacy)** - Simple filter implementation
-
-## Recommended: OpenTelemetry Integration
+## OpenTelemetry Integration
 
 The OpenTelemetry approach is the recommended method as it follows modern observability standards and provides automatic instrumentation.
 
@@ -87,41 +84,6 @@ using var tracerProvider = TracerProviderBuilder.Create()
 var kernel = Kernel.CreateBuilder()
     .AddOpenAIChatCompletion("gpt-4", "your-openai-api-key")
     .Build();
-
-var result = await kernel.InvokePromptAsync("What is the capital of France?");
-Console.WriteLine(result);
-```
-
-## Legacy: Filter-based Integration
-
-The filter-based approach provides a simpler integration but requires manual trace management.
-
-```csharp
-using Microsoft.SemanticKernel;
-using Rashan.SemanticKernel.Langfuse;
-using Rashan.SemanticKernel.Langfuse.Models;
-using Rashan.SemanticKernel.Langfuse.Observability;
-
-// Configure Langfuse
-var langfuseOptions = new LangfuseOptions
-{
-    PublicKey = "pk-...",
-    SecretKey = "sk-...",
-    Endpoint = "https://cloud.langfuse.com" // Optional
-};
-
-// Create Langfuse client and filter
-var langfuseClient = new LangfuseClient(langfuseOptions);
-var langfuseFilter = new LangfuseSemanticKernelFilter(langfuseClient);
-
-// Create Kernel and add filters
-var kernel = Kernel.CreateBuilder()
-    .AddOpenAIChatCompletion("gpt-4", "your-openai-api-key")
-    .Build();
-
-// Register filters for observability
-kernel.PromptRenderFilters.Add(langfuseFilter);
-kernel.FunctionInvocationFilters.Add(langfuseFilter);
 
 var result = await kernel.InvokePromptAsync("What is the capital of France?");
 Console.WriteLine(result);
