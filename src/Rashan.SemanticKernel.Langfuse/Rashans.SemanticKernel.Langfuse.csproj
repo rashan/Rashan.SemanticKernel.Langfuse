@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>Rashans.SemanticKernel.Langfuse</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Rashan</Authors>
+    <Description>Langfuse observability integration for Microsoft Semantic Kernel</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/yourusername/Rashans.SemanticKernel.Langfuse</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/yourusername/Rashans.SemanticKernel.Langfuse</RepositoryUrl>
+    <PackageTags>semantickernel;langfuse;observability;dotnet</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
