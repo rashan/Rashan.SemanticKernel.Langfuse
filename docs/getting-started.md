@@ -1,4 +1,4 @@
-# Getting Started with Rashan.SemanticKernel.Langfuse
+# Getting Started
 
 ## Prerequisites
 
@@ -37,13 +37,14 @@ var builder = Host.CreateApplicationBuilder();
 
 // Add Langfuse integration with OpenTelemetry
 builder.Services.AddLangfuseIntegration(
-    publicKey: "your_public_key",
-    secretKey: "your_secret_key"
-    // endpoint: "https://your-langfuse-instance.com" // Optional for self-hosted
+    publicKey: "pk-...",
+    secretKey: "sk-...",
+    endpoint: "https://cloud.langfuse.com" // Optional: defaults to Langfuse cloud
 );
 
-// Add Semantic Kernel
-builder.Services.AddKernel();
+// Add Semantic Kernel with your preferred AI service
+builder.Services.AddKernel()
+    .AddOpenAIChatCompletion("gpt-4", "your-openai-api-key");
 
 var host = builder.Build();
 
@@ -64,12 +65,12 @@ using Rashan.SemanticKernel.Langfuse.Exporters;
 using Rashan.SemanticKernel.Langfuse.Models;
 using Rashan.SemanticKernel.Langfuse.Observability;
 
-// Configure Langfuse
+// Configure Langfuse options
 var langfuseOptions = new LangfuseOptions
 {
-    PublicKey = "your_public_key",
-    SecretKey = "your_secret_key",
-    Endpoint = "https://your-langfuse-instance.com" // Optional
+    PublicKey = "pk-...",
+    SecretKey = "sk-...",
+    Endpoint = "https://cloud.langfuse.com" // Optional
 };
 
 // Create Langfuse client
@@ -82,12 +83,13 @@ using var tracerProvider = TracerProviderBuilder.Create()
         new LangfuseTraceExporter(langfuseClient)))
     .Build();
 
-// Create and use Semantic Kernel normally
+// Create and use Semantic Kernel
 var kernel = Kernel.CreateBuilder()
-    .AddOpenAIChatCompletion("gpt-4", "your-api-key")
+    .AddOpenAIChatCompletion("gpt-4", "your-openai-api-key")
     .Build();
 
 var result = await kernel.InvokePromptAsync("What is the capital of France?");
+Console.WriteLine(result);
 ```
 
 ## Legacy: Filter-based Integration
@@ -103,27 +105,26 @@ using Rashan.SemanticKernel.Langfuse.Observability;
 // Configure Langfuse
 var langfuseOptions = new LangfuseOptions
 {
-    PublicKey = "your_public_key",
-    SecretKey = "your_secret_key",
-    Endpoint = "https://your-langfuse-instance.com" // Optional
+    PublicKey = "pk-...",
+    SecretKey = "sk-...",
+    Endpoint = "https://cloud.langfuse.com" // Optional
 };
 
-// Create Langfuse client
+// Create Langfuse client and filter
 var langfuseClient = new LangfuseClient(langfuseOptions);
-
-// Create the filter
 var langfuseFilter = new LangfuseSemanticKernelFilter(langfuseClient);
 
-// Add to Kernel
+// Create Kernel and add filters
 var kernel = Kernel.CreateBuilder()
-    .AddOpenAIChatCompletion("gpt-4", "your-api-key")
+    .AddOpenAIChatCompletion("gpt-4", "your-openai-api-key")
     .Build();
 
-// Add filters manually
+// Register filters for observability
 kernel.PromptRenderFilters.Add(langfuseFilter);
 kernel.FunctionInvocationFilters.Add(langfuseFilter);
 
 var result = await kernel.InvokePromptAsync("What is the capital of France?");
+Console.WriteLine(result);
 ```
 
 ## Configuration Options
@@ -140,40 +141,66 @@ var result = await kernel.InvokePromptAsync("What is the capital of France?");
 
 ### Custom OpenTelemetry Configuration
 
+You can customize the OpenTelemetry configuration to add additional exporters or configure sampling:
+
 ```csharp
 builder.Services.AddLangfuseIntegration(
-    publicKey: "your_public_key",
-    secretKey: "your_secret_key",
+    publicKey: "pk-...",
+    secretKey: "sk-...",
     configureTracing: tracingBuilder =>
     {
         // Add additional trace sources
-        tracingBuilder.AddSource("MyCustomSource");
+        tracingBuilder.AddSource("MyApplication.*");
         
-        // Add other exporters
+        // Add console exporter for debugging
         tracingBuilder.AddConsoleExporter();
         
-        // Configure sampling
-        tracingBuilder.SetSampler(new AlwaysOnSampler());
+        // Configure sampling (optional)
+        tracingBuilder.SetSampler(new TraceIdRatioBasedSampler(1.0)); // 100% sampling
     }
 );
 ```
 
 ### Separate Service Registration
 
-For more control, you can register services separately:
+For advanced scenarios, you can register services separately for more control:
 
 ```csharp
-// Register Langfuse services first
+// Step 1: Register Langfuse services
 builder.Services.AddLangfuse(new LangfuseOptions
 {
-    PublicKey = "your_public_key",
-    SecretKey = "your_secret_key"
+    PublicKey = "pk-...",
+    SecretKey = "sk-...",
+    Endpoint = "https://cloud.langfuse.com"
 });
 
-// Then add tracing
+// Step 2: Configure OpenTelemetry tracing
 builder.Services.AddLangfuseTracing(tracingBuilder =>
 {
-    // Custom configuration
+    // Custom tracing configuration
+    tracingBuilder.AddSource("MyApplication.*");
+});
+
+// Step 3: Add Semantic Kernel
+builder.Services.AddKernel()
+    .AddOpenAIChatCompletion("gpt-4", "your-openai-api-key");
+```
+
+### Configuration with Options Pattern
+
+```csharp
+// Configure via appsettings.json
+builder.Services.Configure<LangfuseOptions>(
+    builder.Configuration.GetSection("Langfuse"));
+
+// Or configure programmatically
+builder.Services.AddLangfuse(options =>
+{
+    options.PublicKey = "pk-...";
+    options.SecretKey = "sk-...";
+    options.Endpoint = "https://cloud.langfuse.com";
+    options.ThrowOnError = false; // Don't throw exceptions on API errors
+    options.ReleaseClientOnDispose = true; // Clean up resources
 });
 ```
 
