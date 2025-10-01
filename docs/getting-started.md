@@ -166,17 +166,7 @@ builder.Services.AddLangfuse(options =>
 });
 ```
 
-## Benefits of OpenTelemetry Approach
-
-1. **Industry Standard**: Uses OpenTelemetry, the CNCF standard for observability
-2. **Automatic Instrumentation**: Captures all Semantic Kernel activities automatically
-3. **Rich Context**: Preserves full trace context and relationships
-4. **Performance**: Uses efficient batch processing and async operations
-5. **Extensibility**: Easy to add additional exporters and processors
-6. **Structured Data**: Better handling of prompts, responses, and metadata
-7. **Token Usage**: Automatic extraction of token usage information
-
-## What Gets Tracked
+# What Gets Tracked
 
 The integration automatically captures:
 
