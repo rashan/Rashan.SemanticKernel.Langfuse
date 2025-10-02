@@ -9,13 +9,14 @@ This directory contains practical examples demonstrating how to integrate Semant
 A complete console chat application that demonstrates:
 
 - ✅ **OpenTelemetry Integration**: Automatic tracing of all SemanticKernel operations
+- ✅ **Multi-Provider Support**: Works with OpenAI, Azure OpenAI, Ollama, and other compatible APIs
 - ✅ **Dependency Injection**: Modern .NET hosting with full DI support
 - ✅ **Configuration Management**: Flexible configuration with JSON files and environment variables
 - ✅ **Error Handling**: Robust error handling with user-friendly messages
 - ✅ **Conversation Context**: Maintains chat history and context
 - ✅ **Command System**: Built-in commands for chat management
 
-**Perfect for**: Learning the integration, testing your setup, and understanding how automatic tracing works.
+**Perfect for**: Learning the integration, testing your setup with different AI providers, and understanding how automatic tracing works.
 
 ## Quick Start
 

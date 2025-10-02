@@ -93,6 +93,9 @@ public class Program
         var openAiApiKey = builder.Configuration["OpenAI:ApiKey"] ?? 
                           Environment.GetEnvironmentVariable("OPENAI_API_KEY");
         var openAiModel = builder.Configuration["OpenAI:Model"] ?? "gpt-4o-mini";
+        var openAiEndpoint = builder.Configuration["OpenAI:Endpoint"] ?? 
+                            Environment.GetEnvironmentVariable("OPENAI_ENDPOINT");
+        var openAiProvider = builder.Configuration["OpenAI:Provider"] ?? "OpenAI";
 
         // Validate required configuration
         if (string.IsNullOrEmpty(langfusePublicKey))
@@ -109,12 +112,26 @@ public class Program
             endpoint: langfuseEndpoint
         );
 
-        // Add Semantic Kernel with OpenAI
-        builder.Services.AddKernel()
-            .AddOpenAIChatCompletion(
+        // Add Semantic Kernel with configurable AI provider
+        var kernelBuilder = builder.Services.AddKernel();
+        
+        if (!string.IsNullOrEmpty(openAiEndpoint))
+        {
+            // Custom endpoint (Azure OpenAI, Ollama, etc.)
+            kernelBuilder.AddOpenAIChatCompletion(
+                modelId: openAiModel,
+                apiKey: openAiApiKey,
+                endpoint: new Uri(openAiEndpoint)
+            );
+        }
+        else
+        {
+            // Standard OpenAI
+            kernelBuilder.AddOpenAIChatCompletion(
                 modelId: openAiModel,
                 apiKey: openAiApiKey
             );
+        }
 
         return builder.Build();
     }

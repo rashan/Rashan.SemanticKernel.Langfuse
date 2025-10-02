@@ -38,7 +38,9 @@ Edit the `appsettings.json` file:
   },
   "OpenAI": {
     "ApiKey": "sk-your-openai-api-key",
-    "Model": "gpt-4o-mini"
+    "Model": "gpt-4o-mini",
+    "Endpoint": "",
+    "Provider": "OpenAI"
   }
 }
 ```
@@ -49,6 +51,58 @@ Edit the `appsettings.json` file:
 export LANGFUSE_PUBLIC_KEY="pk-lf-your-public-key"
 export LANGFUSE_SECRET_KEY="sk-lf-your-secret-key"
 export OPENAI_API_KEY="sk-your-openai-api-key"
+export OPENAI_ENDPOINT="https://your-custom-endpoint.com"
+```
+
+### Custom AI Providers
+
+The example supports multiple AI providers through custom endpoints:
+
+**Standard OpenAI (default):**
+```json
+{
+  "OpenAI": {
+    "ApiKey": "sk-your-openai-api-key",
+    "Model": "gpt-4o-mini",
+    "Provider": "OpenAI"
+  }
+}
+```
+
+**Azure OpenAI:**
+```json
+{
+  "OpenAI": {
+    "ApiKey": "your-azure-api-key",
+    "Model": "gpt-4",
+    "Endpoint": "https://your-resource.openai.azure.com/",
+    "Provider": "Azure"
+  }
+}
+```
+
+**Ollama (local):**
+```json
+{
+  "OpenAI": {
+    "ApiKey": "not-used",
+    "Model": "llama2",
+    "Endpoint": "http://localhost:11434/v1",
+    "Provider": "Ollama"
+  }
+}
+```
+
+**Other OpenAI-compatible APIs:**
+```json
+{
+  "OpenAI": {
+    "ApiKey": "your-api-key",
+    "Model": "your-model",
+    "Endpoint": "https://your-api-endpoint.com/v1",
+    "Provider": "Custom"
+  }
+}
 ```
 
 ### 2. Run the Application
